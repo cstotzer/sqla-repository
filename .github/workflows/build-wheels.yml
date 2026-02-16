@@ -28,7 +28,7 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Install dependencies
-        run: poetry install --with dev,gen
+        run: poetry install --with dev
 
       - name: Run ruff
         run: poetry run ruff src tests
