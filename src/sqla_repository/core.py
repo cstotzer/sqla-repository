@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, Generic, Sequence, TypeVar, cast, get_args, get_origin
+from typing import Generic, Sequence, TypeVar, cast, get_args, get_origin
 
 from sqlalchemy import ColumnExpressionArgument, delete, func, select
 from sqlalchemy.orm import DeclarativeBase, Session
