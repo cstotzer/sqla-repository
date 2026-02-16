@@ -58,13 +58,18 @@ Follow these steps in order:
 5. **Push Branch**
    - Push to origin: `git push -u origin chore/{descriptive-name}`
 
+6. **Create Pull Request**
+   - Use GitHub CLI: `gh pr create --fill --base main`
+   - This uses the commit message for title and body
+   - The PR will be created and URL returned
+
 ## Important Notes
 
 - **NO** release or version bump - chores don't change functionality
 - Always create a branch - never commit directly to main
 - Keep commits focused on a single type of infrastructure change
 - List all significant changes in bullet points
-- After pushing, user can create a PR manually or ask for it
+- PR is automatically created after pushing the branch
 
 ## Example Workflow
 
@@ -89,6 +94,9 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 
 # Push branch
 git push -u origin chore/add-ci-workflow
+
+# Create PR
+gh pr create --fill --base main
 ```
 
 ## Success Indicators
@@ -96,4 +104,4 @@ git push -u origin chore/add-ci-workflow
 - Branch created successfully
 - Changes committed with proper format
 - Branch pushed to remote
-- Output shows the branch name for PR creation
+- Pull request created and URL returned
