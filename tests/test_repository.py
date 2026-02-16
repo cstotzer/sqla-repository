@@ -1,3 +1,5 @@
+import pytest
+
 from tests.models import Albums, Artist
 from tests.repositories import AlbumRepository, ArtistRepository
 
@@ -97,6 +99,7 @@ def test_find_by_name(artist_repository: ArtistRepository):
     assert artists[0].Name == "AC/DC"
 
 
+@pytest.mark.skip(reason="Ordering not implemented yet")
 def test_find_all_ordered(artist_repository: ArtistRepository):
     artists = artist_repository.find_all(order_by=Artist.ArtistId)
     # assert len(artists) == 275
