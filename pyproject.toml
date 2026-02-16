@@ -1,0 +1,44 @@
+[project]
+name = "sqla-repository"
+version = "0.1.0"
+description = "A SQLAlchemy repository implementation inspired by JPA Repositories."
+authors = [
+    {name = "Christoph Stotzer",email = "christoph.stotzer@gmail.com"}
+]
+requires-python = ">=3.11"
+dependencies = [
+    "sqlalchemy (>=2.0.46,<3.0.0)"
+]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-coverage (>=0.0,<0.1)"
+]
+gen = [
+    "sqlacodegen (>=3.2.0,<4.0.0)"
+]
+
+[tool.poetry.group.gen]
+optional = true
+
+[tool.poetry]
+packages = [
+    { include = "nicegui_demo_app", from = "src" },
+  ]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "Q", "I"]
+ignore = ["E203", "E501"]
+
+[tool.pytest]
+pythonpath = ["src"]
+minversion = "9.0"
+addopts = ["-ra", "-q"]
+testpaths = [
+    "tests",
+    "integration",
+]
