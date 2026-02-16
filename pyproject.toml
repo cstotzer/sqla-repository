@@ -1,6 +1,6 @@
 [project]
 name = "sqla-repository"
-version = "0.1.0"
+version = "0.1.1"
 description = "A SQLAlchemy repository implementation inspired by JPA Repositories."
 authors = [
     {name = "Christoph Stotzer",email = "christoph.stotzer@gmail.com"}
@@ -24,7 +24,7 @@ optional = true
 
 [tool.poetry]
 packages = [
-    { include = "nicegui_demo_app", from = "src" },
+    { include = "sqla_repository", from = "src" },
   ]
 
 [tool.ruff]
