@@ -65,3 +65,4 @@ Tests use a session-scoped SQLite in-memory database loaded from `tests/resource
     - Modules should have a docstring at the top describing their contents and any important context for users
     - Docstrings should be concise but informative, providing enough context for users to understand the method's purpose and how to use it without needing to read the implementation details
     - Tests should have docstrings describing the purpose of the test and what behavior it is verifying, especially for more complex test cases
+- **Versioning**: The project follows semantic versioning, with the version number updated in `pyproject.toml` for each release. The current version is 0.1.2, indicating that the project is in early development and may have breaking changes before reaching 1.0.0. Version tags should be created in Git for each release, following the format `vX.Y.Z` (e.g., `v0.1.2`). 
