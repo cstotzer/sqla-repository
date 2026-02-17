@@ -1,6 +1,6 @@
 [project]
 name = "sqla-repository"
-version = "0.1.7"
+version = "0.1.8"
 description = "A SQLAlchemy repository implementation inspired by JPA Repositories."
 authors = [
     {name = "Christoph Stotzer",email = "christoph.stotzer@gmail.com"}
