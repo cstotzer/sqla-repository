@@ -30,7 +30,7 @@ if SQLMODEL_AVAILABLE:
 class _RepositoryMixin(Generic[EntityType, IdType]):
     """
     Mixin containing all repository CRUD operations.
-    
+
     This mixin provides the implementation that is shared between
     Repository (for SQLAlchemy) and SQLModelRepository (for SQLModel).
     """

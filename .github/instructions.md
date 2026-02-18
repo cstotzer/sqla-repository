@@ -377,12 +377,37 @@ sqlrepository/
 
 ### Creating a Release
 
+**The project now uses automated CI/CD for releases!**
+
 1. **Update version**: Edit `pyproject.toml` (semantic versioning)
-2. **Commit version bump**: `git commit -m "chore: bump version to X.Y.Z"`
-3. **Create tag**: `git tag vX.Y.Z`
-4. **Push tag**: `git push origin vX.Y.Z`
-5. **GitHub release**: Workflow automatically builds wheels and creates release
-6. **Verify**: Check GitHub releases page for artifacts
+   ```toml
+   [project]
+   version = "0.2.0"  # Update this
+   ```
+
+2. **Commit and push**:
+   ```bash
+   git add pyproject.toml
+   git commit -m "chore: bump version to 0.2.0"
+   git push
+   ```
+
+3. **Trigger release workflow**:
+   - Go to GitHub Actions tab
+   - Select "Release" workflow
+   - Click "Run workflow"
+   - Choose branch (usually `main`)
+   - Click "Run workflow"
+
+4. **Automated steps** (no manual intervention):
+   - ✅ Extract version from pyproject.toml
+   - ✅ Run quality checks (lint, format, mypy, tests)
+   - ✅ Build package (wheel + sdist)
+   - ✅ Create git tag (e.g., `v0.2.0`)
+   - ✅ Create GitHub release with notes
+   - ✅ Publish to PyPI
+
+See [`.github/CICD.md`](.github/CICD.md) for detailed CI/CD documentation.
 
 ### Running Type Checks
 

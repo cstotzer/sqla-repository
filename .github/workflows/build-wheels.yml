@@ -1,41 +1,16 @@
-# This workflow builds wheels and a source distribution for new releases.
-# It also runs ruff and pytest before building.
+# This workflow builds wheels when a release is published.
+# Note: The main release process is now handled by release.yml
+# This workflow is kept for backward compatibility with manual GitHub releases.
 
-name: Build wheels
+name: Build Wheels (Legacy)
 
 on:
   release:
     types: [published]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12']
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
-      - name: Install dependencies
-        run: uv sync --all-groups
-
-      - name: Run ruff
-        run: uv run ruff check src tests
-
-      - name: Run pytest
-        run: uv run pytest
-
   build:
-    needs: test
+    name: Build and Upload Artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -53,8 +28,8 @@ jobs:
         run: uv build
 
       - name: Upload release artifacts
-        uses: Roang-zero1/github-upload-release-artifacts-action@v2
+        uses: softprops/action-gh-release@v1
         with:
-          args: "dist/*"
+          files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -550,14 +550,25 @@ uv run mypy src/sqlrepository --ignore-missing-imports
 - Keep changes focused and atomic
 - Ensure CI checks pass before requesting review
 
+All pull requests trigger automated checks:
+- ✅ Linting (ruff)
+- ✅ Type checking (mypy)
+- ✅ Security scanning (pip-audit)
+- ✅ Tests on Python 3.11 & 3.12
+- ✅ Coverage reporting
+
 ### Release Process
 
-Releases are managed through GitHub releases:
+Releases are fully automated via GitHub Actions. See [CI/CD Documentation](.github/CICD.md) for details.
 
-1. Version is bumped in `pyproject.toml`
-2. Changes are committed and tagged (e.g., `v0.1.8`)
-3. GitHub Actions builds and publishes to PyPI automatically
-4. Release notes are generated from commit history
+**Quick release steps**:
+1. Update version in `pyproject.toml`
+2. Commit: `git commit -m "chore: bump version to X.Y.Z"`
+3. Push to GitHub
+4. Go to Actions → Release workflow → Run workflow
+5. Package is automatically built, tagged, and published to PyPI
+
+For detailed instructions, see [`.github/CICD.md`](.github/CICD.md).
 
 ## License
 
