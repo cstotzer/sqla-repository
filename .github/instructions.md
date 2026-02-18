@@ -13,35 +13,35 @@ A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired
 
 ## Build, Test, and Lint
 
-This project uses **Poetry** for dependency management.
+This project uses **uv** for dependency management.
 
 ```bash
 # Install dependencies (including optional groups)
-poetry install
+uv sync --all-groups
 
 # Run all tests
-poetry run pytest
+uv run pytest
 
 # Run tests with coverage
-poetry run pytest --cov=sqla_repository --cov-report=term-missing
+uv run pytest --cov=sqla_repository --cov-report=term-missing
 
 # Run specific test file
-poetry run pytest tests/test_repository.py -v
+uv run pytest tests/test_repository.py -v
 
 # Run specific test
-poetry run pytest tests/test_repository.py::test_find_by_id -v
+uv run pytest tests/test_repository.py::test_find_by_id -v
 
 # Run async tests only
-poetry run pytest tests/test_async_repository.py tests/test_async_sqlmodel_repository.py -v
+uv run pytest tests/test_async_repository.py tests/test_async_sqlmodel_repository.py -v
 
 # Lint code
-poetry run ruff check .
+uv run ruff check .
 
 # Format code
-poetry run ruff format .
+uv run ruff format .
 
 # Type check with mypy
-poetry run mypy src/sqla_repository
+uv run mypy src/sqla_repository
 ```
 
 ## Architecture
@@ -252,16 +252,16 @@ gen = [
 
 ```bash
 # Basic (SQLAlchemy only)
-poetry add sqla-repository
+uv add sqla-repository
 
 # With SQLModel support
-poetry add sqla-repository --extras sqlmodel
+uv add 'sqla-repository[sqlmodel]'
 
 # With async support
-poetry add sqla-repository --extras async
+uv add 'sqla-repository[async]'
 
 # With everything
-poetry add sqla-repository --extras "sqlmodel,async"
+uv add 'sqla-repository[sqlmodel,async]'
 ```
 
 ## Code Conventions
@@ -348,8 +348,8 @@ sqla-repository/
 │   ├── test_sqlmodel_repository.py  # Sync SQLModel tests (12 tests)
 │   ├── test_async_repository.py     # Async SQLAlchemy tests (19 tests)
 │   └── test_async_sqlmodel_repository.py  # Async SQLModel tests (12 tests)
-├── pyproject.toml                   # Poetry configuration, dependencies
-├── poetry.lock                      # Locked dependencies
+├── pyproject.toml                   # uv configuration, dependencies
+├── uv.lock                          # Locked dependencies
 ├── README.md                        # User-facing documentation
 └── LICENSE                          # GPL-3.0 license
 ```
@@ -362,16 +362,16 @@ sqla-repository/
 2. **Add to mixin**: Add to `_RepositoryMixin` or `_AsyncRepositoryMixin`
 3. **Write docstring**: Follow Google style
 4. **Add tests**: Test in both Repository and SQLModelRepository test files
-5. **Run tests**: `poetry run pytest -v`
+5. **Run tests**: `uv run pytest -v`
 
 ### Adding a New Feature
 
 1. **Create feature branch**: `git checkout -b feature/feature-name`
 2. **Implement with tests**: TDD approach recommended
 3. **Update README**: Add usage examples
-4. **Run full test suite**: `poetry run pytest -v`
-5. **Check coverage**: `poetry run pytest --cov`
-6. **Lint and format**: `poetry run ruff check . && poetry run ruff format .`
+4. **Run full test suite**: `uv run pytest -v`
+5. **Check coverage**: `uv run pytest --cov`
+6. **Lint and format**: `uv run ruff check . && uv run ruff format .`
 7. **Commit**: Use conventional commits (feat:, fix:, docs:, etc.)
 
 ### Creating a Release
@@ -387,10 +387,10 @@ sqla-repository/
 
 ```bash
 # Check types in source
-poetry run mypy src/sqla_repository
+uv run mypy src/sqla_repository
 
 # Check types in tests (may have issues due to test fixtures)
-poetry run mypy tests
+uv run mypy tests
 ```
 
 ## Important Notes

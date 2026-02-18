@@ -24,20 +24,23 @@ A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired
 # Basic installation with SQLAlchemy support
 pip install sqla-repository
 
-# Or with Poetry
-poetry add sqla-repository
+# Or with uv
+uv add sqla-repository
 
 # For SQLModel support (optional)
 pip install 'sqla-repository[sqlmodel]'
-# or
-poetry add sqla-repository --extras sqlmodel
+# or with uv
+uv add 'sqla-repository[sqlmodel]'
 
 # For async support (SQLAlchemy async)
 pip install 'sqla-repository[async]'
-# Required: aiosqlite, greenlet
+# or with uv
+uv add 'sqla-repository[async]'
 
 # For full async + SQLModel support
 pip install 'sqla-repository[async,sqlmodel]'
+# or with uv
+uv add 'sqla-repository[async,sqlmodel]'
 ```
 
 ## Usage
@@ -340,43 +343,45 @@ We welcome contributions! Here's how to get started:
 git clone https://github.com/cstotzer/sqla-repository.git
 cd sqla-repository
 
-# Install dependencies with Poetry
-poetry install --with dev,sqlmodel
+# Install dependencies with uv
+uv sync --all-groups
 
-# Activate virtual environment
-poetry shell
+# The virtual environment is automatically managed by uv
 ```
 
 ### Running Tests
 
 ```bash
 # Run all tests
-poetry run pytest
+uv run pytest
 
 # Run with coverage
-poetry run pytest --cov=sqla_repository --cov-report=term-missing
+uv run pytest --cov=sqla_repository --cov-report=term-missing
 
 # Run specific test file
-poetry run pytest tests/test_repository.py -v
+uv run pytest tests/test_repository.py -v
 
 # Run specific test
-poetry run pytest tests/test_repository.py::test_save -v
+uv run pytest tests/test_repository.py::test_save -v
+
+# Run async tests only
+uv run pytest tests/test_async_repository.py tests/test_async_sqlmodel_repository.py -v
 ```
 
 ### Code Quality Checks
 
 ```bash
 # Run linter
-poetry run ruff check src tests
+uv run ruff check src tests
 
 # Auto-fix linting issues
-poetry run ruff check --fix src tests
+uv run ruff check --fix src tests
 
 # Format code
-poetry run ruff format src tests
+uv run ruff format src tests
 
 # Type checking
-poetry run mypy src/sqla_repository --ignore-missing-imports
+uv run mypy src/sqla_repository --ignore-missing-imports
 ```
 
 ### Submitting Changes

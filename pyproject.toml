@@ -1,43 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "sqla-repository"
 version = "0.1.8"
 description = "A SQLAlchemy repository implementation inspired by JPA Repositories."
 authors = [
-    {name = "Christoph Stotzer",email = "christoph.stotzer@gmail.com"}
+    {name = "Christoph Stotzer", email = "christoph.stotzer@gmail.com"}
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "sqlalchemy (>=2.0.46,<3.0.0)",
+    "sqlalchemy>=2.0.46,<3.0.0",
+]
+readme = "README.md"
+license = {text = "GPL-3.0"}
+keywords = ["sqlalchemy", "repository", "pattern", "orm", "database", "crud", "sqlmodel"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.optional-dependencies]
+sqlmodel = [
+    "sqlmodel>=0.0.34,<0.1.0",
+]
+async = [
+    "aiosqlite>=0.20.0,<0.21.0",
+    "greenlet>=3.2.0,<4.0.0",
 ]
 
 [dependency-groups]
 sqlmodel = [
-    "sqlmodel (>=0.0.34,<0.1.0)"
+    "sqlmodel>=0.0.34,<0.1.0",
 ]
 async = [
-    "aiosqlite (>=0.20.0,<0.21.0)",
-    "greenlet (>=3.2.0,<4.0.0)",
+    "aiosqlite>=0.20.0,<0.21.0",
+    "greenlet>=3.2.0,<4.0.0",
 ]
 dev = [
-    "pytest (>=8.2.0,<9.0.0)",
-    "pytest-coverage (>=0.0,<0.1)",
-    "pytest-asyncio (>=0.26.0,<0.27.0)",
-    "ruff (>=0.15.1,<0.16.0)",
-    "mypy (>=1.19.1,<2.0.0)",
-    { include-group = "sqlmodel" },
-    { include-group = "async" }
+    "pytest>=8.2.0,<9.0.0",
+    "pytest-coverage>=0.0,<0.1",
+    "pytest-asyncio>=0.26.0,<0.27.0",
+    "ruff>=0.15.1,<0.16.0",
+    "mypy>=1.19.1,<2.0.0",
+    # Include sqlmodel and async groups
+    "sqlmodel>=0.0.34,<0.1.0",
+    "aiosqlite>=0.20.0,<0.21.0",
+    "greenlet>=3.2.0,<4.0.0",
 ]
 gen = [
-    "sqlacodegen (>=3.2.0,<4.0.0)"
+    "sqlacodegen>=3.2.0,<4.0.0",
 ]
 
-[tool.poetry.group.gen]
-optional = true
-
-[tool.poetry]
-packages = [
-    { include = "sqla_repository", from = "src" },
-  ]
+[tool.hatch.build.targets.wheel]
+packages = ["src/sqla_repository"]
 
 [tool.ruff]
 line-length = 79
