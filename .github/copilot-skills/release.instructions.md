@@ -12,7 +12,7 @@ Use this skill when the user asks to:
 
 ## Release Process
 
-Follow these steps in order:
+Follow these steps in order, when no outstanding changes exist skip to step 2 and 3
 
 1. **Update Version**
    - Edit `pyproject.toml` and update the `version` field to the target version
@@ -42,6 +42,10 @@ Follow these steps in order:
 ## Important Notes
 
 - Always check `git status` first to see what changes exist
+- Ensure that we are on the main branch before pushing
+- The version in `pyproject.toml` must match the tag version
+- Ensure all tests pass before releasing (run `poetry run pytest` if unsure)
+- The GitHub CLI (`gh`) must be authenticated to create releases
 - Review the diff of outstanding changes before committing
 - The version in pyproject.toml must match the tag version
 - Ensure all tests pass before releasing (run `poetry run pytest` if unsure)

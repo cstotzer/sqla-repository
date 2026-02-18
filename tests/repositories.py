@@ -1,4 +1,4 @@
-from sqla_repository.core import Repository
+from sqlrepository import Repository
 from tests.models import Albums, Artist
 
 

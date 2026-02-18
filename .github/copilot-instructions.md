@@ -2,28 +2,30 @@
 
 A SQLAlchemy repository implementation inspired by Spring Data JPA repositories.
 
+**Note**: This file is deprecated. Please refer to `.github/instructions.md` for up-to-date project documentation.
+
 ## Build, Test, and Lint
 
-This project uses Poetry for dependency management.
+This project uses **uv** for dependency management.
 
 ```bash
 # Install dependencies
-poetry install
+uv sync --all-groups
 
 # Run all tests
-poetry run pytest
+uv run pytest
 
 # Run a specific test
-poetry run pytest tests/test_repository.py::test_find_by_id
+uv run pytest tests/test_repository.py::test_find_by_id
 
 # Run tests with coverage
-poetry run pytest --cov=sqla_repository
+uv run pytest --cov=sqla_repository
 
 # Lint code
-poetry run ruff check .
+uv run ruff check .
 
 # Format code
-poetry run ruff format .
+uv run ruff format .
 ```
 
 ## Architecture

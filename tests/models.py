@@ -18,7 +18,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqla_repository.core import Base
+from sqlrepository import Base
 
 
 class Artist(Base):
