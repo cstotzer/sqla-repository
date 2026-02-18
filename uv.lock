@@ -558,68 +558,6 @@ wheels = [
 ]
 
 [[package]]
-name = "sqla-repository"
-version = "0.1.8"
-source = { editable = "." }
-dependencies = [
-    { name = "sqlalchemy" },
-]
-
-[package.optional-dependencies]
-async = [
-    { name = "aiosqlite" },
-    { name = "greenlet" },
-]
-sqlmodel = [
-    { name = "sqlmodel" },
-]
-
-[package.dev-dependencies]
-async = [
-    { name = "aiosqlite" },
-    { name = "greenlet" },
-]
-dev = [
-    { name = "aiosqlite" },
-    { name = "greenlet" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-coverage" },
-    { name = "ruff" },
-    { name = "sqlmodel" },
-]
-sqlmodel = [
-    { name = "sqlmodel" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosqlite", marker = "extra == 'async'", specifier = ">=0.20.0,<0.21.0" },
-    { name = "greenlet", marker = "extra == 'async'", specifier = ">=3.2.0,<4.0.0" },
-    { name = "sqlalchemy", specifier = ">=2.0.46,<3.0.0" },
-    { name = "sqlmodel", marker = "extra == 'sqlmodel'", specifier = ">=0.0.34,<0.1.0" },
-]
-provides-extras = ["sqlmodel", "async"]
-
-[package.metadata.requires-dev]
-async = [
-    { name = "aiosqlite", specifier = ">=0.20.0,<0.21.0" },
-    { name = "greenlet", specifier = ">=3.2.0,<4.0.0" },
-]
-dev = [
-    { name = "aiosqlite", specifier = ">=0.20.0,<0.21.0" },
-    { name = "greenlet", specifier = ">=3.2.0,<4.0.0" },
-    { name = "mypy", specifier = ">=1.19.1,<2.0.0" },
-    { name = "pytest", specifier = ">=8.2.0,<9.0.0" },
-    { name = "pytest-asyncio", specifier = ">=0.26.0,<0.27.0" },
-    { name = "pytest-coverage", specifier = ">=0.0,<0.1" },
-    { name = "ruff", specifier = ">=0.15.1,<0.16.0" },
-    { name = "sqlmodel", specifier = ">=0.0.34,<0.1.0" },
-]
-sqlmodel = [{ name = "sqlmodel", specifier = ">=0.0.34,<0.1.0" }]
-
-[[package]]
 name = "sqlalchemy"
 version = "2.0.46"
 source = { registry = "https://pypi.org/simple" }
@@ -680,6 +618,68 @@ sdist = { url = "https://files.pythonhosted.org/packages/3b/6a/b1b26d589063e53a0
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/ee/1910f4eee41af4268b0d8cd688a05fb8ea23e9e6c64b8710592df24a8c66/sqlmodel-0.0.34-py3-none-any.whl", hash = "sha256:aeabc8f0de32076a0ed9216e88568459d737fca1e7133bfc6d1c657920789a2d", size = 27445, upload-time = "2026-02-16T19:06:35.709Z" },
 ]
+
+[[package]]
+name = "sqlrepository"
+version = "0.1.8"
+source = { editable = "." }
+dependencies = [
+    { name = "sqlalchemy" },
+]
+
+[package.optional-dependencies]
+async = [
+    { name = "aiosqlite" },
+    { name = "greenlet" },
+]
+sqlmodel = [
+    { name = "sqlmodel" },
+]
+
+[package.dev-dependencies]
+async = [
+    { name = "aiosqlite" },
+    { name = "greenlet" },
+]
+dev = [
+    { name = "aiosqlite" },
+    { name = "greenlet" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-coverage" },
+    { name = "ruff" },
+    { name = "sqlmodel" },
+]
+sqlmodel = [
+    { name = "sqlmodel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosqlite", marker = "extra == 'async'", specifier = ">=0.20.0,<0.21.0" },
+    { name = "greenlet", marker = "extra == 'async'", specifier = ">=3.2.0,<4.0.0" },
+    { name = "sqlalchemy", specifier = ">=2.0.46,<3.0.0" },
+    { name = "sqlmodel", marker = "extra == 'sqlmodel'", specifier = ">=0.0.34,<0.1.0" },
+]
+provides-extras = ["sqlmodel", "async"]
+
+[package.metadata.requires-dev]
+async = [
+    { name = "aiosqlite", specifier = ">=0.20.0,<0.21.0" },
+    { name = "greenlet", specifier = ">=3.2.0,<4.0.0" },
+]
+dev = [
+    { name = "aiosqlite", specifier = ">=0.20.0,<0.21.0" },
+    { name = "greenlet", specifier = ">=3.2.0,<4.0.0" },
+    { name = "mypy", specifier = ">=1.19.1,<2.0.0" },
+    { name = "pytest", specifier = ">=8.2.0,<9.0.0" },
+    { name = "pytest-asyncio", specifier = ">=0.26.0,<0.27.0" },
+    { name = "pytest-coverage", specifier = ">=0.0,<0.1" },
+    { name = "ruff", specifier = ">=0.15.1,<0.16.0" },
+    { name = "sqlmodel", specifier = ">=0.0.34,<0.1.0" },
+]
+sqlmodel = [{ name = "sqlmodel", specifier = ">=0.0.34,<0.1.0" }]
 
 [[package]]
 name = "tomli"

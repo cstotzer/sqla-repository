@@ -1,11 +1,11 @@
 """SQLAlchemy repository pattern implementation."""
 
-from sqla_repository.core import Base, Repository
-from sqla_repository.async_repository import AsyncRepository
+from sqlrepository.core import Base, Repository
+from sqlrepository.async_repository import AsyncRepository
 
 try:
-    from sqla_repository.core import SQLModelRepository
-    from sqla_repository.async_repository import AsyncSQLModelRepository
+    from sqlrepository.core import SQLModelRepository
+    from sqlrepository.async_repository import AsyncSQLModelRepository
 
     __all__ = [
         "Base",

@@ -6,8 +6,8 @@ from sqlalchemy import Integer, String
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import Mapped, mapped_column
 
-from sqla_repository import Base
-from sqla_repository.async_repository import AsyncRepository
+from sqlrepository import Base
+from sqlrepository.async_repository import AsyncRepository
 
 
 # Test models

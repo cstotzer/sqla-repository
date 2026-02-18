@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sqla-repository"
+name = "sqlrepository"
 version = "0.1.8"
 description = "A SQLAlchemy repository implementation inspired by JPA Repositories."
 authors = [
@@ -57,7 +57,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/sqla_repository"]
+packages = ["src/sqlrepository"]
 
 [tool.ruff]
 line-length = 79

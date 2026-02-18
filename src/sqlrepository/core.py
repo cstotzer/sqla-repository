@@ -1,11 +1,8 @@
-"""Async repository implementations for SQLAlchemy and SQLModel."""
-
 from collections.abc import Iterable
 from typing import Any, Generic, Sequence, TypeVar, cast, get_args, get_origin
 
 from sqlalchemy import ColumnExpressionArgument, delete, func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Session
 
 try:
     from sqlmodel import SQLModel
@@ -16,7 +13,13 @@ except ImportError:
     SQLMODEL_AVAILABLE = False
 
 
-# TypeVar definitions
+class Base(DeclarativeBase):
+    """Base class for all SQLAlchemy models in the repository."""
+
+    pass
+
+
+# Clean, simple TypeVar definitions - no conditionals!
 EntityType = TypeVar("EntityType", bound=DeclarativeBase)
 IdType = TypeVar("IdType")
 
@@ -24,16 +27,16 @@ if SQLMODEL_AVAILABLE:
     SQLModelEntityType = TypeVar("SQLModelEntityType", bound=SQLModel)  # type: ignore
 
 
-class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
+class _RepositoryMixin(Generic[EntityType, IdType]):
     """
-    Mixin containing all async repository CRUD operations.
-
-    This mixin provides the async implementation that is shared between
-    AsyncRepository (for SQLAlchemy) and AsyncSQLModelRepository (for SQLModel).
+    Mixin containing all repository CRUD operations.
+    
+    This mixin provides the implementation that is shared between
+    Repository (for SQLAlchemy) and SQLModelRepository (for SQLModel).
     """
 
     model: type[Any]
-    session: AsyncSession
+    session: Session
 
     def _model_type(self) -> type[EntityType]:
         """
@@ -44,7 +47,7 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         return cast(type[EntityType], self.__class__.model)
 
-    async def save(self, entity: EntityType) -> EntityType:
+    def save(self, entity: EntityType) -> EntityType:
         """
         Saves a given entity to the database.
 
@@ -60,11 +63,10 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         if entity is None:
             raise ValueError("entity must not be None")
         self.session.add(entity)
-        await self.session.flush()
-        await self.session.refresh(entity)
+        self.session.flush()
         return entity
 
-    async def save_all(self, entities: Iterable[EntityType]) -> Sequence[EntityType]:
+    def save_all(self, entities: Iterable[EntityType]) -> Sequence[EntityType]:
         """
         Saves all given entities to the database.
 
@@ -81,20 +83,15 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         if any(entity is None for entity in items):
             raise ValueError("entities must not contain None")
         self.session.add_all(items)
-        await self.session.flush()
-        for entity in items:
-            await self.session.refresh(entity)
+        self.session.flush()
         return items
 
-    async def find_all(
+    def find_all(
         self,
         order_by: ColumnExpressionArgument[Any] | None = None,
     ) -> Sequence[EntityType]:
         """
         Returns all instances of the model type.
-
-        Args:
-            order_by: Optional column expression to order results by.
 
         Returns:
             Sequence[EntityType]: All entities in the database.
@@ -104,10 +101,10 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         if order_by is not None:
             statement = statement.order_by(order_by)
 
-        result = await self.session.scalars(statement)
-        return result.all()
+        result = self.session.scalars(statement).all()
+        return result
 
-    async def find_by_id(self, id: IdType) -> EntityType | None:
+    def find_by_id(self, id: IdType) -> EntityType | None:
         """
         Retrieves an entity by its id.
 
@@ -122,9 +119,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         if id is None:
             raise ValueError("id must not be None")
-        return await self.session.get(self._model_type(), id)
+        return self.session.get(self._model_type(), id)
 
-    async def exists_by_id(self, id: IdType) -> bool:
+    def exists_by_id(self, id: IdType) -> bool:
         """
         Returns whether an entity with the given id exists.
 
@@ -139,9 +136,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         if id is None:
             raise ValueError("id must not be None")
-        return await self.find_by_id(id) is not None
+        return self.find_by_id(id) is not None
 
-    async def find_all_by_id(self, ids: Iterable[IdType]) -> Sequence[EntityType]:
+    def find_all_by_id(self, ids: Iterable[IdType]) -> Sequence[EntityType]:
         """
         Returns all entities matching the given ids.
 
@@ -160,12 +157,12 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
 
         entities: list[EntityType] = []
         for id_value in id_values:
-            entity = await self.find_by_id(id_value)
+            entity = self.find_by_id(id_value)
             if entity is not None:
                 entities.append(entity)
         return entities
 
-    async def count(self) -> int:
+    def count(self) -> int:
         """
         Returns the number of entities available.
 
@@ -173,10 +170,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
             int: The count of entities in the database.
         """
         statement = select(func.count()).select_from(self._model_type())
-        result = await self.session.scalar(statement)
-        return int(result or 0)
+        return int(self.session.scalar(statement) or 0)
 
-    async def delete_by_id(self, id: IdType) -> None:
+    def delete_by_id(self, id: IdType) -> None:
         """
         Deletes the entity with the given id.
 
@@ -188,11 +184,11 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         if id is None:
             raise ValueError("id must not be None")
-        entity = await self.find_by_id(id)
+        entity = self.find_by_id(id)
         if entity is not None:
-            await self.session.delete(entity)
+            self.session.delete(entity)
 
-    async def delete(self, entity: EntityType) -> None:
+    def delete(self, entity: EntityType) -> None:
         """
         Deletes a given entity from the database.
 
@@ -204,9 +200,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         if entity is None:
             raise ValueError("entity must not be None")
-        await self.session.delete(entity)
+        self.session.delete(entity)
 
-    async def delete_all_by_id(self, ids: Iterable[IdType]) -> None:
+    def delete_all_by_id(self, ids: Iterable[IdType]) -> None:
         """
         Deletes all entities with the given ids.
 
@@ -220,9 +216,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         if any(id_value is None for id_value in id_values):
             raise ValueError("ids must not contain None")
         for id_value in id_values:
-            await self.delete_by_id(id_value)
+            self.delete_by_id(id_value)
 
-    async def delete_all(self, entities: Iterable[EntityType] | None = None) -> None:
+    def delete_all(self, entities: Iterable[EntityType] | None = None) -> None:
         """
         Deletes all entities in the database, or all given entities if provided.
 
@@ -234,137 +230,116 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         """
         if entities is None:
             statement = delete(self._model_type())
-            await self.session.execute(statement)
+            self.session.execute(statement)
             return
 
         items = list(entities)
         if any(entity is None for entity in items):
             raise ValueError("entities must not contain None")
         for entity in items:
-            await self.session.delete(entity)
+            self.session.delete(entity)
 
 
-class AsyncRepository(_AsyncRepositoryMixin[EntityType, IdType]):
+class Repository(_RepositoryMixin[EntityType, IdType]):
     """
-    Generic async repository for SQLAlchemy DeclarativeBase models.
+    Generic repository for SQLAlchemy DeclarativeBase models.
 
     This class is inspired by Spring Data's CrudRepository interface.
-    Subclasses must specify the model type via AsyncRepository[Model, IdType].
+    Subclasses must specify the model type via Repository[Model, IdType].
 
     Example:
         ```python
-        from sqlalchemy.ext.asyncio import AsyncSession
-        from sqla_repository import Base
-        from sqla_repository.async_repository import AsyncRepository
-
         class User(Base):
             __tablename__ = "users"
             id: Mapped[int] = mapped_column(Integer, primary_key=True)
             name: Mapped[str] = mapped_column(String(50))
 
-        class UserRepository(AsyncRepository[User, int]):
+        class UserRepository(Repository[User, int]):
             pass
-
-        # Usage
-        async with AsyncSession(engine) as session:
-            repo = UserRepository(session)
-            user = await repo.find_by_id(1)
         ```
     """
 
     model: type[DeclarativeBase]
 
-    def __init__(self, session: AsyncSession):
+    def __init_subclass__(cls, **kwargs):
         """
-        Initializes the repository with an async session.
-
-        Args:
-            session (AsyncSession): The async SQLAlchemy session to use.
-        """
-        self.session = session
-
-    def __init_subclass__(cls, **kwargs: Any) -> None:
-        """
-        Automatically sets the model type from the generic type argument.
-
-        This is called when a subclass is created, allowing us to extract
-        the model type from Repository[Model, IdType] syntax.
+        Initializes the subclass and sets the model type for the repository.
         """
         super().__init_subclass__(**kwargs)
+        for base in getattr(cls, "__orig_bases__", ()):
+            if get_origin(base) is Repository:
+                (model, _) = get_args(base)
+                if isinstance(model, type) and issubclass(model, DeclarativeBase):
+                    cls.model = model
+                    return
 
-        for base in cls.__orig_bases__:  # type: ignore
-            origin = get_origin(base)
-            if origin is None:
-                continue
+    def __init__(self, session: Session):
+        """
+        Initializes the repository with a SQLAlchemy session.
 
-            if issubclass(origin, AsyncRepository):
-                args = get_args(base)
-                if args:
-                    cls.model = args[0]
-                    break
+        Args:
+            session (Session): The SQLAlchemy session to use for database operations.
+
+        Raises:
+            TypeError: If the model type is not specified in the subclass.
+        """
+        self.session = session
+        if not hasattr(self.__class__, "model"):
+            raise TypeError(
+                f"{self.__class__.__name__} must specify a model via Repository[Model, IdType]"
+            )
 
 
 if SQLMODEL_AVAILABLE:
 
-    class AsyncSQLModelRepository(_AsyncRepositoryMixin[SQLModelEntityType, IdType]):  # type: ignore
+    class SQLModelRepository(_RepositoryMixin[SQLModelEntityType, IdType]):  # type: ignore
         """
-        Generic async repository for SQLModel models.
+        Generic repository for SQLModel models.
 
-        This class provides the same interface as AsyncRepository but is designed
-        to work with SQLModel classes instead of SQLAlchemy DeclarativeBase.
+        This class provides the same repository pattern for SQLModel models
+        with built-in Pydantic validation.
 
         Example:
             ```python
             from sqlmodel import Field, SQLModel
-            from sqlalchemy.ext.asyncio import AsyncSession
-            from sqla_repository.async_repository import AsyncSQLModelRepository
+            from sqlrepository.core import SQLModelRepository
 
-            class User(SQLModel, table=True):
+            class Hero(SQLModel, table=True):
                 id: int | None = Field(default=None, primary_key=True)
-                name: str
+                name: str = Field(index=True)
+                age: int | None = None
 
-            class UserRepository(AsyncSQLModelRepository[User, int]):
+            class HeroRepository(SQLModelRepository[Hero, int]):
                 pass
-
-            # Usage
-            async with AsyncSession(engine) as session:
-                repo = UserRepository(session)
-                user = await repo.find_by_id(1)
             ```
         """
 
         model: type[SQLModel]  # type: ignore
 
-        def __init__(self, session: AsyncSession):
+        def __init_subclass__(cls, **kwargs):
             """
-            Initializes the repository with an async session.
-
-            Args:
-                session (AsyncSession): The async SQLAlchemy session to use.
-            """
-            self.session = session
-
-        def __init_subclass__(cls, **kwargs: Any) -> None:
-            """
-            Automatically sets the model type from the generic type argument.
-
-            This is called when a subclass is created, allowing us to extract
-            the model type from AsyncSQLModelRepository[Model, IdType] syntax.
+            Initializes the subclass and sets the model type for the repository.
             """
             super().__init_subclass__(**kwargs)
+            for base in getattr(cls, "__orig_bases__", ()):
+                if get_origin(base) is SQLModelRepository:
+                    (model, _) = get_args(base)
+                    if isinstance(model, type) and issubclass(model, SQLModel):  # type: ignore
+                        cls.model = model
+                        return
 
-            for base in cls.__orig_bases__:  # type: ignore
-                origin = get_origin(base)
-                if origin is None:
-                    continue
+        def __init__(self, session: Session):
+            """
+            Initializes the repository with a SQLAlchemy session.
 
-                if issubclass(origin, AsyncSQLModelRepository):
-                    args = get_args(base)
-                    if args:
-                        cls.model = args[0]
-                        break
+            Args:
+                session (Session): The SQLAlchemy session to use for database operations.
 
-
-__all__ = ["AsyncRepository"]
-if SQLMODEL_AVAILABLE:
-    __all__.append("AsyncSQLModelRepository")
+            Raises:
+                TypeError: If the model type is not specified in the subclass.
+            """
+            self.session = session
+            if not hasattr(self.__class__, "model"):
+                raise TypeError(
+                    f"{self.__class__.__name__} must specify a model via SQLModelRepository[Model, IdType]"
+                )

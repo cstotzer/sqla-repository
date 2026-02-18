@@ -1,10 +1,10 @@
-# sqla-repository
+# sqlrepository
 
 A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired by Spring Data's JPA Repositories.
 
 ## Overview
 
-`sqla-repository` provides a clean, type-safe repository pattern for database operations, eliminating boilerplate CRUD code and promoting consistent data access patterns across your application. Whether you're using SQLAlchemy's `DeclarativeBase` or SQLModel's enhanced models with validation, this library offers a unified interface for your data access layer.
+`sqlrepository` provides a clean, type-safe repository pattern for database operations, eliminating boilerplate CRUD code and promoting consistent data access patterns across your application. Whether you're using SQLAlchemy's `DeclarativeBase` or SQLModel's enhanced models with validation, this library offers a unified interface for your data access layer.
 
 **Inspired by Spring Data JPA**, this package brings the elegant repository pattern from the Java ecosystem to Python, adapted for SQLAlchemy's powerful ORM capabilities.
 
@@ -22,25 +22,25 @@ A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired
 
 ```bash
 # Basic installation with SQLAlchemy support
-pip install sqla-repository
+pip install sqlrepository
 
 # Or with uv
-uv add sqla-repository
+uv add sqlrepository
 
 # For SQLModel support (optional)
-pip install 'sqla-repository[sqlmodel]'
+pip install 'sqlrepository[sqlmodel]'
 # or with uv
-uv add 'sqla-repository[sqlmodel]'
+uv add 'sqlrepository[sqlmodel]'
 
 # For async support (SQLAlchemy async)
-pip install 'sqla-repository[async]'
+pip install 'sqlrepository[async]'
 # or with uv
-uv add 'sqla-repository[async]'
+uv add 'sqlrepository[async]'
 
 # For full async + SQLModel support
-pip install 'sqla-repository[async,sqlmodel]'
+pip install 'sqlrepository[async,sqlmodel]'
 # or with uv
-uv add 'sqla-repository[async,sqlmodel]'
+uv add 'sqlrepository[async,sqlmodel]'
 ```
 
 ## Usage
@@ -52,7 +52,7 @@ Define your model using SQLAlchemy's `DeclarativeBase`:
 ```python
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqla_repository import Base, Repository
+from sqlrepository import Base, Repository
 
 
 class User(Base):
@@ -110,7 +110,7 @@ SQLModel combines SQLAlchemy's power with Pydantic's validation:
 
 ```python
 from sqlmodel import Field, SQLModel
-from sqla_repository import SQLModelRepository
+from sqlrepository import SQLModelRepository
 
 
 class Artist(SQLModel, table=True):
@@ -158,8 +158,8 @@ For asynchronous database operations, use `AsyncRepository` with SQLAlchemy's as
 
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqla_repository import Base
-from sqla_repository.async_repository import AsyncRepository
+from sqlrepository import Base
+from sqlrepository.async_repository import AsyncRepository
 
 class Artist(Base):
     __tablename__ = "artists"
@@ -199,7 +199,7 @@ SQLModel also supports async operations:
 ```python
 from sqlmodel import Field, SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqla_repository.async_repository import AsyncSQLModelRepository
+from sqlrepository.async_repository import AsyncSQLModelRepository
 
 class Artist(SQLModel, table=True):
     __tablename__ = "artists"
@@ -244,7 +244,7 @@ This separation of concerns provides several benefits:
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqla_repository import Repository
+from sqlrepository import Repository
 
 engine = create_engine("sqlite:///chinook.db")
 
@@ -277,7 +277,7 @@ with Session(engine) as session:
 ```python
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqla_repository import Repository
+from sqlrepository import Repository
 
 engine = create_engine("sqlite:///chinook.db")
 
@@ -304,7 +304,7 @@ finally:
 
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqla_repository import AsyncRepository
+from sqlrepository import AsyncRepository
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:")
 
@@ -336,7 +336,7 @@ async with AsyncSession(engine, expire_on_commit=False) as session:
 
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqla_repository import AsyncRepository
+from sqlrepository import AsyncRepository
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:")
 
@@ -371,7 +371,7 @@ Extend the repository with your own query methods:
 
 ```python
 from sqlalchemy import select
-from sqla_repository import Repository
+from sqlrepository import Repository
 
 
 class UserRepository(Repository[User, int]):
@@ -403,7 +403,7 @@ For async repositories, use the same pattern with async methods:
 
 ```python
 from sqlalchemy import select
-from sqla_repository.async_repository import AsyncRepository
+from sqlrepository.async_repository import AsyncRepository
 
 
 class AsyncUserRepository(AsyncRepository[User, int]):
@@ -480,8 +480,8 @@ We welcome contributions! Here's how to get started:
 
 ```bash
 # Clone the repository
-git clone https://github.com/cstotzer/sqla-repository.git
-cd sqla-repository
+git clone https://github.com/cstotzer/sqlrepository.git
+cd sqlrepository
 
 # Install dependencies with uv
 uv sync --all-groups
@@ -496,7 +496,7 @@ uv sync --all-groups
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=sqla_repository --cov-report=term-missing
+uv run pytest --cov=sqlrepository --cov-report=term-missing
 
 # Run specific test file
 uv run pytest tests/test_repository.py -v
@@ -521,7 +521,7 @@ uv run ruff check --fix src tests
 uv run ruff format src tests
 
 # Type checking
-uv run mypy src/sqla_repository --ignore-missing-imports
+uv run mypy src/sqlrepository --ignore-missing-imports
 ```
 
 ### Submitting Changes
@@ -579,4 +579,4 @@ We believe in open source software and want to ensure that improvements to this 
 
 ---
 
-**Made with ❤️ by the sqla-repository contributors**
+**Made with ❤️ by the sqlrepository contributors**

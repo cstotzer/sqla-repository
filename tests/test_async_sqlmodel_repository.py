@@ -8,7 +8,7 @@ sqlmodel = pytest.importorskip("sqlmodel")
 from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from sqla_repository.async_repository import AsyncSQLModelRepository
+from sqlrepository.async_repository import AsyncSQLModelRepository
 from tests.sqlmodel_models import Album, Artist
 
 

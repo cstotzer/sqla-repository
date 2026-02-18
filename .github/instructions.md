@@ -1,10 +1,10 @@
-# sqla-repository - GitHub Copilot Instructions
+# sqlrepository - GitHub Copilot Instructions
 
 A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired by Spring Data's JPA Repositories.
 
 ## Project Overview
 
-**sqla-repository** provides a clean, type-safe repository pattern for database operations with both synchronous and asynchronous support. It supports:
+**sqlrepository** provides a clean, type-safe repository pattern for database operations with both synchronous and asynchronous support. It supports:
 - ✅ SQLAlchemy DeclarativeBase models
 - ✅ SQLModel models with Pydantic validation
 - ✅ Async/await with AsyncRepository
@@ -23,7 +23,7 @@ uv sync --all-groups
 uv run pytest
 
 # Run tests with coverage
-uv run pytest --cov=sqla_repository --cov-report=term-missing
+uv run pytest --cov=sqlrepository --cov-report=term-missing
 
 # Run specific test file
 uv run pytest tests/test_repository.py -v
@@ -41,7 +41,7 @@ uv run ruff check .
 uv run ruff format .
 
 # Type check with mypy
-uv run mypy src/sqla_repository
+uv run mypy src/sqlrepository
 ```
 
 ## Architecture
@@ -50,7 +50,7 @@ uv run mypy src/sqla_repository
 
 The project uses a **mixin pattern** to share CRUD implementation while maintaining clean separation between different repository types:
 
-#### Synchronous Repositories (`src/sqla_repository/core.py`)
+#### Synchronous Repositories (`src/sqlrepository/core.py`)
 
 ```
 _RepositoryMixin[EntityType, IdType]
@@ -68,7 +68,7 @@ _RepositoryMixin[EntityType, IdType]
     └── Example: SQLModelRepository[Artist, int]
 ```
 
-#### Asynchronous Repositories (`src/sqla_repository/async_repository.py`)
+#### Asynchronous Repositories (`src/sqlrepository/async_repository.py`)
 
 ```
 _AsyncRepositoryMixin[EntityType, IdType]
@@ -120,7 +120,7 @@ The `__init_subclass__` method inspects `__orig_bases__` and extracts the first 
 
 ```python
 from sqlalchemy import select
-from sqla_repository import Repository
+from sqlrepository import Repository
 
 class ArtistRepository(Repository[Artist, int]):
     def find_by_name(self, name: str) -> list[Artist]:
@@ -138,7 +138,7 @@ class ArtistRepository(Repository[Artist, int]):
 
 ```python
 from sqlalchemy import select
-from sqla_repository.async_repository import AsyncRepository
+from sqlrepository.async_repository import AsyncRepository
 
 class AsyncArtistRepository(AsyncRepository[Artist, int]):
     async def find_by_name(self, name: str) -> list[Artist]:
@@ -253,16 +253,16 @@ gen = [
 
 ```bash
 # Basic (SQLAlchemy only)
-uv add sqla-repository
+uv add sqlrepository
 
 # With SQLModel support
-uv add 'sqla-repository[sqlmodel]'
+uv add 'sqlrepository[sqlmodel]'
 
 # With async support
-uv add 'sqla-repository[async]'
+uv add 'sqlrepository[async]'
 
 # With everything
-uv add 'sqla-repository[sqlmodel,async]'
+uv add 'sqlrepository[sqlmodel,async]'
 ```
 
 ## Code Conventions
@@ -326,7 +326,7 @@ if entity is None:
 ## Project Structure
 
 ```
-sqla-repository/
+sqlrepository/
 ├── .github/
 │   ├── copilot-instructions.md      # Legacy instructions (being replaced)
 │   ├── instructions.md               # This file
@@ -336,7 +336,7 @@ sqla-repository/
 │   └── workflows/
 │       ├── build-wheels.yml         # Release workflow
 │       └── ci.yml                   # CI workflow
-├── src/sqla_repository/
+├── src/sqlrepository/
 │   ├── __init__.py                  # Package exports
 │   ├── core.py                      # Sync: Repository, SQLModelRepository
 │   └── async_repository.py          # Async: AsyncRepository, AsyncSQLModelRepository
@@ -388,7 +388,7 @@ sqla-repository/
 
 ```bash
 # Check types in source
-uv run mypy src/sqla_repository
+uv run mypy src/sqlrepository
 
 # Check types in tests (may have issues due to test fixtures)
 uv run mypy tests

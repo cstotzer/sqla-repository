@@ -6,7 +6,7 @@ sqlmodel = pytest.importorskip("sqlmodel")
 
 from sqlmodel import Session, SQLModel, create_engine
 
-from sqla_repository import SQLModelRepository
+from sqlrepository import SQLModelRepository
 from tests.sqlmodel_models import Album, Artist
 
 
