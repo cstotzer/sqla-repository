@@ -39,7 +39,9 @@ def sqlmodel_session():
         session.commit()
 
         album1 = Album(
-            AlbumId=1, Title="For Those About To Rock We Salute You", ArtistId=1
+            AlbumId=1,
+            Title="For Those About To Rock We Salute You",
+            ArtistId=1,
         )
         album2 = Album(AlbumId=2, Title="Let There Be Rock", ArtistId=1)
         session.add(album1)

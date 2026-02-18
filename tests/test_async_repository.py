@@ -42,9 +42,7 @@ class AlbumRepository(AsyncRepository[AsyncAlbum, int]):
 @pytest_asyncio.fixture
 async def async_session():
     """Create an async in-memory SQLite session for testing."""
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:", echo=False
-    )
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -58,7 +56,9 @@ async def async_session():
         await session.commit()
 
         album1 = AsyncAlbum(
-            AlbumId=1, Title="For Those About To Rock We Salute You", ArtistId=1
+            AlbumId=1,
+            Title="For Those About To Rock We Salute You",
+            ArtistId=1,
         )
         album2 = AsyncAlbum(AlbumId=2, Title="Let There Be Rock", ArtistId=1)
         session.add(album1)

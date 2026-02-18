@@ -64,7 +64,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         await self.session.refresh(entity)
         return entity
 
-    async def save_all(self, entities: Iterable[EntityType]) -> Sequence[EntityType]:
+    async def save_all(
+        self, entities: Iterable[EntityType]
+    ) -> Sequence[EntityType]:
         """
         Saves all given entities to the database.
 
@@ -141,7 +143,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
             raise ValueError("id must not be None")
         return await self.find_by_id(id) is not None
 
-    async def find_all_by_id(self, ids: Iterable[IdType]) -> Sequence[EntityType]:
+    async def find_all_by_id(
+        self, ids: Iterable[IdType]
+    ) -> Sequence[EntityType]:
         """
         Returns all entities matching the given ids.
 
@@ -222,7 +226,9 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         for id_value in id_values:
             await self.delete_by_id(id_value)
 
-    async def delete_all(self, entities: Iterable[EntityType] | None = None) -> None:
+    async def delete_all(
+        self, entities: Iterable[EntityType] | None = None
+    ) -> None:
         """
         Deletes all entities in the database, or all given entities if provided.
 
@@ -306,7 +312,9 @@ class AsyncRepository(_AsyncRepositoryMixin[EntityType, IdType]):
 
 if SQLMODEL_AVAILABLE:
 
-    class AsyncSQLModelRepository(_AsyncRepositoryMixin[SQLModelEntityType, IdType]):  # type: ignore
+    class AsyncSQLModelRepository(
+        _AsyncRepositoryMixin[SQLModelEntityType, IdType]
+    ):  # type: ignore
         """
         Generic async repository for SQLModel models.
 

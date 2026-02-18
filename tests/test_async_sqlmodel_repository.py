@@ -28,9 +28,7 @@ class AlbumRepository(AsyncSQLModelRepository[Album, int]):
 @pytest_asyncio.fixture
 async def async_sqlmodel_session():
     """Create an async in-memory SQLite session for testing."""
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:", echo=False
-    )
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
@@ -44,7 +42,9 @@ async def async_sqlmodel_session():
         await session.commit()
 
         album1 = Album(
-            AlbumId=1, Title="For Those About To Rock We Salute You", ArtistId=1
+            AlbumId=1,
+            Title="For Those About To Rock We Salute You",
+            ArtistId=1,
         )
         album2 = Album(AlbumId=2, Title="Let There Be Rock", ArtistId=1)
         session.add(album1)
@@ -55,7 +55,9 @@ async def async_sqlmodel_session():
 
 
 @pytest.mark.asyncio
-async def test_sqlmodel_repository_instantiation(async_sqlmodel_session: AsyncSession):
+async def test_sqlmodel_repository_instantiation(
+    async_sqlmodel_session: AsyncSession,
+):
     """Test that AsyncSQLModelRepository can be instantiated."""
     repo = ArtistRepository(async_sqlmodel_session)
     assert repo is not None
@@ -183,7 +185,9 @@ async def test_sqlmodel_delete_all(async_sqlmodel_session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_sqlmodel_multiple_repositories(async_sqlmodel_session: AsyncSession):
+async def test_sqlmodel_multiple_repositories(
+    async_sqlmodel_session: AsyncSession,
+):
     """Test using multiple async repositories with different SQLModel models."""
     artist_repo = ArtistRepository(async_sqlmodel_session)
     album_repo = AlbumRepository(async_sqlmodel_session)

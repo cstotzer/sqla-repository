@@ -269,7 +269,9 @@ class Repository(_RepositoryMixin[EntityType, IdType]):
         for base in getattr(cls, "__orig_bases__", ()):
             if get_origin(base) is Repository:
                 (model, _) = get_args(base)
-                if isinstance(model, type) and issubclass(model, DeclarativeBase):
+                if isinstance(model, type) and issubclass(
+                    model, DeclarativeBase
+                ):
                     cls.model = model
                     return
 
