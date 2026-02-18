@@ -2,7 +2,7 @@
 
 from sqlmodel import Field, SQLModel
 
-from sqla_repository.core import SQLModelRepository
+from sqla_repository import SQLModelRepository
 
 
 # SQLModel test models

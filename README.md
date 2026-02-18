@@ -41,7 +41,7 @@ Define your model using SQLAlchemy's `DeclarativeBase`:
 ```python
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqla_repository.core import Base, Repository
+from sqla_repository import Base, Repository
 
 
 class User(Base):
@@ -99,7 +99,7 @@ SQLModel combines SQLAlchemy's power with Pydantic's validation:
 
 ```python
 from sqlmodel import Field, SQLModel
-from sqla_repository.core import Repository
+from sqla_repository import SQLModelRepository
 
 
 class Hero(SQLModel, table=True):
@@ -110,7 +110,7 @@ class Hero(SQLModel, table=True):
     age: int | None = Field(default=None, ge=0, le=150)
 
 
-class HeroRepository(Repository[Hero, int]):
+class HeroRepository(SQLModelRepository[Hero, int]):
     """Repository for Hero model."""
     pass
 ```
@@ -147,6 +147,7 @@ Extend the repository with your own query methods:
 
 ```python
 from sqlalchemy import select
+from sqla_repository import Repository
 
 
 class UserRepository(Repository[User, int]):
