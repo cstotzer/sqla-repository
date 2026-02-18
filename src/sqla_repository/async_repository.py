@@ -243,24 +243,6 @@ class _AsyncRepositoryMixin(Generic[EntityType, IdType]):
         for entity in items:
             await self.session.delete(entity)
 
-    async def flush(self) -> None:
-        """
-        Flushes all pending changes to the database without committing them.
-        """
-        await self.session.flush()
-
-    async def commit(self) -> None:
-        """
-        Commits the current transaction, making all pending changes permanent.
-        """
-        await self.session.commit()
-
-    async def rollback(self) -> None:
-        """
-        Rolls back the current transaction, discarding all pending changes.
-        """
-        await self.session.rollback()
-
 
 class AsyncRepository(_AsyncRepositoryMixin[EntityType, IdType]):
     """

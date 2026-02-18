@@ -103,8 +103,9 @@ The `__init_subclass__` method inspects `__orig_bases__` and extracts the first 
 
 - **Sync**: Repositories receive a `Session` in `__init__`
 - **Async**: Repositories receive an `AsyncSession` in `__init__`
-- Operations like `save()` only **flush** by default
-- **Commit is the caller's responsibility** for transaction control
+- **Transaction control is the caller's responsibility** (no commit/flush/rollback methods exposed)
+- Repositories perform internal flush operations as needed (e.g., to get generated IDs)
+- This follows the Spring Data JPA pattern of separation of concerns
 
 #### Async Considerations
 

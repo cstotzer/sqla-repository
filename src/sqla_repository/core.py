@@ -239,24 +239,6 @@ class _RepositoryMixin(Generic[EntityType, IdType]):
         for entity in items:
             self.session.delete(entity)
 
-    def flush(self) -> None:
-        """
-        Flushes all pending changes to the database without committing them.
-        """
-        self.session.flush()
-
-    def commit(self) -> None:
-        """
-        Commits the current transaction, making all pending changes permanent.
-        """
-        self.session.commit()
-
-    def rollback(self) -> None:
-        """
-        Rolls back the current transaction, discarding all pending changes.
-        """
-        self.session.rollback()
-
 
 class Repository(_RepositoryMixin[EntityType, IdType]):
     """

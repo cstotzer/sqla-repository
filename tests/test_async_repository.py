@@ -232,38 +232,6 @@ async def test_delete_all_with_entities(async_session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_flush(async_session: AsyncSession):
-    """Test flushing changes."""
-    repo = ArtistRepository(async_session)
-    artist = AsyncArtist(Name="Iron Maiden")
-    
-    await repo.save(artist)
-    await repo.flush()
-    
-    # Entity should have an ID after flush
-    assert artist.ArtistId is not None
-
-
-@pytest.mark.asyncio
-async def test_rollback(async_session: AsyncSession):
-    """Test rolling back changes."""
-    repo = ArtistRepository(async_session)
-    initial_count = await repo.count()
-    
-    artist = AsyncArtist(Name="Iron Maiden")
-    await repo.save(artist)
-    await async_session.commit()
-    
-    # Now delete and rollback
-    await repo.delete(artist)
-    await repo.rollback()
-    
-    # Count should be back to initial + 1
-    count = await repo.count()
-    assert count == initial_count + 1
-
-
-@pytest.mark.asyncio
 async def test_multiple_repositories(async_session: AsyncSession):
     """Test using multiple repositories with different models."""
     artist_repo = ArtistRepository(async_session)

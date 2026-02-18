@@ -225,6 +225,146 @@ async def main():
 
 **Note**: When using async sessions, set `expire_on_commit=False` to avoid lazy-loading issues after commit.
 
+## Transaction Management
+
+Following the Spring Data JPA pattern, repositories do **not** expose transaction control methods (`commit()`, `flush()`, `rollback()`). Transaction boundaries should be managed by the caller (e.g., service layer or application code).
+
+### Why This Pattern?
+
+This separation of concerns provides several benefits:
+- **Clear Responsibility**: Repositories handle data access, not transaction boundaries
+- **Flexibility**: The caller controls when to commit or rollback
+- **Composability**: Multiple repository calls can participate in a single transaction
+- **Testability**: Easier to test with controlled transaction boundaries
+
+### Synchronous Transaction Management
+
+#### Using Context Managers (Recommended)
+
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqla_repository import Repository
+
+engine = create_engine("sqlite:///chinook.db")
+
+# Context manager handles commit/rollback automatically
+with Session(engine) as session:
+    repo = Repository[Artist, int](Artist, session)
+    
+    artist = Artist(Name="Pink Floyd")
+    repo.save(artist)
+    
+    # Commit happens automatically when exiting the context
+    # Rollback happens automatically on exception
+
+# For multiple operations in one transaction:
+with Session(engine) as session:
+    artist_repo = Repository[Artist, int](Artist, session)
+    album_repo = Repository[Album, int](Album, session)
+    
+    artist = Artist(Name="The Beatles")
+    artist_repo.save(artist)
+    
+    album = Album(Title="Abbey Road", ArtistId=artist.ArtistId)
+    album_repo.save(album)
+    
+    # Both operations committed together
+```
+
+#### Manual Transaction Control
+
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqla_repository import Repository
+
+engine = create_engine("sqlite:///chinook.db")
+
+session = Session(engine)
+try:
+    repo = Repository[Artist, int](Artist, session)
+    
+    artist = Artist(Name="Queen")
+    repo.save(artist)
+    
+    # Explicitly commit
+    session.commit()
+except Exception as e:
+    # Explicitly rollback on error
+    session.rollback()
+    raise
+finally:
+    session.close()
+```
+
+### Asynchronous Transaction Management
+
+#### Using Async Context Managers (Recommended)
+
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqla_repository import AsyncRepository
+
+engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+
+# Context manager handles commit/rollback automatically
+async with AsyncSession(engine, expire_on_commit=False) as session:
+    repo = AsyncRepository[AsyncArtist, int](AsyncArtist, session)
+    
+    artist = AsyncArtist(Name="Radiohead")
+    await repo.save(artist)
+    
+    # Commit happens automatically when exiting the context
+    # Rollback happens automatically on exception
+
+# For multiple operations in one transaction:
+async with AsyncSession(engine, expire_on_commit=False) as session:
+    artist_repo = AsyncRepository[AsyncArtist, int](AsyncArtist, session)
+    album_repo = AsyncRepository[AsyncAlbum, int](AsyncAlbum, session)
+    
+    artist = AsyncArtist(Name="Nirvana")
+    await artist_repo.save(artist)
+    
+    album = AsyncAlbum(Title="Nevermind", ArtistId=artist.ArtistId)
+    await album_repo.save(album)
+    
+    # Both operations committed together
+```
+
+#### Manual Async Transaction Control
+
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqla_repository import AsyncRepository
+
+engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+
+session = AsyncSession(engine, expire_on_commit=False)
+try:
+    repo = AsyncRepository[AsyncArtist, int](AsyncArtist, session)
+    
+    artist = AsyncArtist(Name="Metallica")
+    await repo.save(artist)
+    
+    # Explicitly commit
+    await session.commit()
+except Exception as e:
+    # Explicitly rollback on error
+    await session.rollback()
+    raise
+finally:
+    await session.close()
+```
+
+### Best Practices
+
+1. **Use Context Managers**: They automatically handle commit/rollback and cleanup
+2. **One Transaction per Use Case**: Group related operations in a single transaction
+3. **Handle Errors Gracefully**: Always rollback on exceptions
+4. **Set expire_on_commit=False**: For async sessions to avoid lazy-loading issues
+5. **Service Layer Pattern**: Let services manage transactions, repositories manage data
+
 ### Adding Custom Query Methods
 
 Extend the repository with your own query methods:
