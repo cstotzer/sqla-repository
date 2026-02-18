@@ -3,8 +3,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Generic,
+    Protocol,
     Sequence,
     TypeVar,
+    Union,
     cast,
     get_args,
     get_origin,
@@ -34,9 +36,20 @@ class Base(DeclarativeBase):
     pass
 
 
-# EntityType bound to DeclarativeBase for SQLAlchemy models
-# SQLModel models work at runtime but aren't bound by inheritance
-EntityType = TypeVar("EntityType", bound=DeclarativeBase)
+# For type checking, accept Union of DeclarativeBase and SQLModel
+# At runtime, DeclarativeBase bound works (checked in __init_subclass__)
+if TYPE_CHECKING:
+    try:
+        from sqlmodel import SQLModel as _SQLModelType
+
+        EntityType = TypeVar(
+            "EntityType", bound=Union[DeclarativeBase, _SQLModelType]
+        )  # type: ignore[misc]
+    except ImportError:
+        EntityType = TypeVar("EntityType", bound=DeclarativeBase)  # type: ignore[misc]
+else:
+    EntityType = TypeVar("EntityType", bound=DeclarativeBase)
+
 IdType = TypeVar("IdType")
 
 
@@ -65,7 +78,11 @@ class Repository(Generic[EntityType, IdType]):
                     if issubclass(model, DeclarativeBase):
                         cls.model = model
                         return
-                    if SQLMODEL_AVAILABLE and SQLModel is not None and issubclass(model, SQLModel):
+                    if (
+                        SQLMODEL_AVAILABLE
+                        and SQLModel is not None
+                        and issubclass(model, SQLModel)
+                    ):
                         cls.model = model
                         return
 

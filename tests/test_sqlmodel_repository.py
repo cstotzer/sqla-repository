@@ -1,18 +1,8 @@
 """Tests for SQLModel compatibility with Repository."""
-import pytest
 
-try:
-    from sqlmodel import Field, SQLModel
-
-    SQLMODEL_AVAILABLE = True
-except ImportError:
-    SQLMODEL_AVAILABLE = False
+from sqlmodel import Field, SQLModel
 
 from sqla_repository.core import Repository
-
-pytestmark = pytest.mark.skipif(
-    not SQLMODEL_AVAILABLE, reason="SQLModel not installed"
-)
 
 
 # SQLModel test models

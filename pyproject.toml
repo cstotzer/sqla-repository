@@ -11,17 +11,18 @@ dependencies = [
 ]
 
 [dependency-groups]
+sqlmodel = [
+    "sqlmodel (>=0.0.34,<0.1.0)"
+]
 dev = [
     "pytest (>=9.0.2,<10.0.0)",
     "pytest-coverage (>=0.0,<0.1)",
     "ruff (>=0.15.1,<0.16.0)",
-    "mypy (>=1.19.1,<2.0.0)"
+    "mypy (>=1.19.1,<2.0.0)",
+    { include-group = "sqlmodel" }
 ]
 gen = [
     "sqlacodegen (>=3.2.0,<4.0.0)"
-]
-sqlmodel = [
-    "sqlmodel (>=0.0.34,<0.1.0)"
 ]
 
 [tool.poetry.group.gen]
