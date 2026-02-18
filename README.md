@@ -256,6 +256,53 @@ class UserRepository(Repository[User, int]):
         return list(self.session.scalars(statement))
 ```
 
+For async repositories, use the same pattern with async methods:
+
+```python
+from sqlalchemy import select
+from sqla_repository.async_repository import AsyncRepository
+
+
+class AsyncUserRepository(AsyncRepository[User, int]):
+    async def find_by_username(self, username: str) -> User | None:
+        """Find user by username."""
+        statement = select(User).where(User.username == username)
+        result = await self.session.scalar(statement)
+        return result
+    
+    async def find_by_age_range(self, min_age: int, max_age: int) -> list[User]:
+        """Find users within age range."""
+        statement = (
+            select(User)
+            .where(User.age >= min_age, User.age <= max_age)
+            .order_by(User.age)
+        )
+        result = await self.session.scalars(statement)
+        return list(result)
+    
+    async def find_active_users(self) -> list[User]:
+        """Custom business logic query."""
+        statement = (
+            select(User)
+            .where(User.is_active == True)
+            .order_by(User.username)
+        )
+        result = await self.session.scalars(statement)
+        return list(result)
+
+
+# Usage
+async def main():
+    async with AsyncSession(engine) as session:
+        user_repo = AsyncUserRepository(session)
+        
+        # Use custom async methods
+        user = await user_repo.find_by_username("john_doe")
+        active_users = await user_repo.find_active_users()
+        young_users = await user_repo.find_by_age_range(18, 30)
+```
+```
+
 ### Available Repository Methods
 
 All repositories provide these methods out of the box:
