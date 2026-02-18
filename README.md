@@ -102,16 +102,16 @@ from sqlmodel import Field, SQLModel
 from sqla_repository import SQLModelRepository
 
 
-class Hero(SQLModel, table=True):
-    """SQLModel hero with built-in validation."""
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(index=True, min_length=1, max_length=50)
-    secret_name: str
-    age: int | None = Field(default=None, ge=0, le=150)
+class Artist(SQLModel, table=True):
+    """SQLModel artist with built-in validation."""
+    __tablename__ = "artists"
+    
+    ArtistId: int | None = Field(default=None, primary_key=True)
+    Name: str = Field(index=True, min_length=1, max_length=120)
 
 
-class HeroRepository(SQLModelRepository[Hero, int]):
-    """Repository for Hero model."""
+class ArtistRepository(SQLModelRepository[Artist, int]):
+    """Repository for Artist model."""
     pass
 ```
 
@@ -121,23 +121,23 @@ Use with SQLModel:
 from sqlmodel import create_engine, Session, SQLModel
 
 # Setup
-engine = create_engine("sqlite:///heroes.db")
+engine = create_engine("sqlite:///music.db")
 SQLModel.metadata.create_all(engine)
 
 with Session(engine) as session:
-    hero_repo = HeroRepository(session)
+    artist_repo = ArtistRepository(session)
     
     # Create with validation
-    hero = Hero(name="Spider-Man", secret_name="Peter Parker", age=23)
-    hero_repo.save(hero)
+    artist = Artist(Name="AC/DC")
+    artist_repo.save(artist)
     session.commit()
     
     # Bulk operations
-    heroes = [
-        Hero(name="Iron Man", secret_name="Tony Stark", age=48),
-        Hero(name="Black Widow", secret_name="Natasha Romanoff", age=34),
+    artists = [
+        Artist(Name="Led Zeppelin"),
+        Artist(Name="Pink Floyd"),
     ]
-    hero_repo.save_all(heroes)
+    artist_repo.save_all(artists)
     session.commit()
 ```
 
