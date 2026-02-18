@@ -12,6 +12,7 @@ A Python repository pattern implementation for SQLAlchemy and SQLModel, inspired
 
 - 🎯 **Type-safe** - Full type hints and generic support for IDE autocomplete
 - 🔄 **Dual ORM support** - Works with both SQLAlchemy and SQLModel
+- ⚡ **Async support** - First-class async/await support with AsyncRepository
 - 🚀 **Zero boilerplate** - Common CRUD operations out of the box
 - 🧩 **Extensible** - Easy to add custom query methods
 - ✅ **Well-tested** - Comprehensive test suite with high coverage
@@ -27,9 +28,16 @@ pip install sqla-repository
 poetry add sqla-repository
 
 # For SQLModel support (optional)
-pip install sqla-repository[sqlmodel]
+pip install 'sqla-repository[sqlmodel]'
 # or
 poetry add sqla-repository --extras sqlmodel
+
+# For async support (SQLAlchemy async)
+pip install 'sqla-repository[async]'
+# Required: aiosqlite, greenlet
+
+# For full async + SQLModel support
+pip install 'sqla-repository[async,sqlmodel]'
 ```
 
 ## Usage
@@ -140,6 +148,79 @@ with Session(engine) as session:
     artist_repo.save_all(artists)
     session.commit()
 ```
+
+### Using Async Repositories
+
+For asynchronous database operations, use `AsyncRepository` with SQLAlchemy's async capabilities:
+
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqla_repository import Base
+from sqla_repository.async_repository import AsyncRepository
+
+class Artist(Base):
+    __tablename__ = "artists"
+    
+    ArtistId: Mapped[int] = mapped_column(Integer, primary_key=True)
+    Name: Mapped[str] = mapped_column(String(120))
+
+
+class ArtistRepository(AsyncRepository[Artist, int]):
+    pass
+
+
+# Usage
+async def main():
+    engine = create_async_engine("sqlite+aiosqlite:///music.db")
+    
+    async with AsyncSession(engine) as session:
+        artist_repo = ArtistRepository(session)
+        
+        # All repository methods are async
+        artist = Artist(Name="AC/DC")
+        await artist_repo.save(artist)
+        await session.commit()
+        
+        # Find operations
+        found = await artist_repo.find_by_id(1)
+        all_artists = await artist_repo.find_all()
+        count = await artist_repo.count()
+        
+        # Delete operations
+        await artist_repo.delete_by_id(1)
+        await session.commit()
+```
+
+SQLModel also supports async operations:
+
+```python
+from sqlmodel import Field, SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqla_repository.async_repository import AsyncSQLModelRepository
+
+class Artist(SQLModel, table=True):
+    __tablename__ = "artists"
+    
+    ArtistId: int | None = Field(default=None, primary_key=True)
+    Name: str = Field(max_length=120)
+
+
+class ArtistRepository(AsyncSQLModelRepository[Artist, int]):
+    pass
+
+
+async def main():
+    engine = create_async_engine("sqlite+aiosqlite:///music.db")
+    
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        artist_repo = ArtistRepository(session)
+        
+        artist = Artist(Name="Led Zeppelin")
+        await artist_repo.save(artist)
+        await session.commit()
+```
+
+**Note**: When using async sessions, set `expire_on_commit=False` to avoid lazy-loading issues after commit.
 
 ### Adding Custom Query Methods
 

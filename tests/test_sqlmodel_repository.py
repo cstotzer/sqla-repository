@@ -4,29 +4,10 @@ import pytest
 
 sqlmodel = pytest.importorskip("sqlmodel")
 
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from sqla_repository import SQLModelRepository
-
-
-# SQLModel test models
-class Artist(SQLModel, table=True):
-    """SQLModel artist model."""
-
-    __tablename__ = "artists"
-
-    ArtistId: int | None = Field(default=None, primary_key=True)
-    Name: str | None = Field(default=None, max_length=120)
-
-
-class Album(SQLModel, table=True):
-    """SQLModel album model."""
-
-    __tablename__ = "albums"
-
-    AlbumId: int | None = Field(default=None, primary_key=True)
-    Title: str = Field(max_length=160)
-    ArtistId: int = Field(foreign_key="artists.ArtistId")
+from tests.sqlmodel_models import Album, Artist
 
 
 # Repository implementations
