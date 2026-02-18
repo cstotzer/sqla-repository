@@ -2,7 +2,7 @@
 
 from sqlmodel import Field, SQLModel
 
-from sqla_repository.core import Repository
+from sqla_repository.core import SQLModelRepository
 
 
 # SQLModel test models
@@ -24,13 +24,13 @@ class Team(SQLModel, table=True):
 
 
 # Repository implementations
-class HeroRepository(Repository[Hero, int]):
+class HeroRepository(SQLModelRepository[Hero, int]):
     """Repository for Hero model."""
 
     pass
 
 
-class TeamRepository(Repository[Team, int]):
+class TeamRepository(SQLModelRepository[Team, int]):
     """Repository for Team model."""
 
     pass

@@ -1,33 +1,16 @@
 from collections.abc import Iterable
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Generic,
-    Protocol,
-    Sequence,
-    TypeVar,
-    Union,
-    cast,
-    get_args,
-    get_origin,
-)
+from typing import Any, Generic, Sequence, TypeVar, cast, get_args, get_origin
 
 from sqlalchemy import ColumnExpressionArgument, delete, func, select
 from sqlalchemy.orm import DeclarativeBase, Session
-
-if TYPE_CHECKING:
-    try:
-        from sqlmodel import SQLModel
-    except ImportError:
-        pass
 
 try:
     from sqlmodel import SQLModel
 
     SQLMODEL_AVAILABLE = True
 except ImportError:
-    SQLMODEL_AVAILABLE = False
     SQLModel = None  # type: ignore
+    SQLMODEL_AVAILABLE = False
 
 
 class Base(DeclarativeBase):
@@ -36,71 +19,24 @@ class Base(DeclarativeBase):
     pass
 
 
-# For type checking, accept Union of DeclarativeBase and SQLModel
-# At runtime, DeclarativeBase bound works (checked in __init_subclass__)
-if TYPE_CHECKING:
-    try:
-        from sqlmodel import SQLModel as _SQLModelType
-
-        EntityType = TypeVar(
-            "EntityType", bound=Union[DeclarativeBase, _SQLModelType]
-        )  # type: ignore[misc]
-    except ImportError:
-        EntityType = TypeVar("EntityType", bound=DeclarativeBase)  # type: ignore[misc]
-else:
-    EntityType = TypeVar("EntityType", bound=DeclarativeBase)
-
+# Clean, simple TypeVar definitions - no conditionals!
+EntityType = TypeVar("EntityType", bound=DeclarativeBase)
 IdType = TypeVar("IdType")
 
+if SQLMODEL_AVAILABLE:
+    SQLModelEntityType = TypeVar("SQLModelEntityType", bound=SQLModel)  # type: ignore
 
-class Repository(Generic[EntityType, IdType]):
+
+class _RepositoryMixin(Generic[EntityType, IdType]):
     """
-    Generic repository providing basic CRUD operations for SQLAlchemy models.
-
-    This class is inspired by Spring Data's CrudRepository interface.
-    Subclasses must specify the model type via Repository[Model, IdType].
+    Mixin containing all repository CRUD operations.
+    
+    This mixin provides the implementation that is shared between
+    Repository (for SQLAlchemy) and SQLModelRepository (for SQLModel).
     """
 
-    model: type[Base]
-
-    def __init_subclass__(cls, **kwargs):
-        """
-        Initializes the subclass and sets the model type for the repository.
-        Supports both SQLAlchemy Base and SQLModel models.
-        """
-        super().__init_subclass__(**kwargs)
-        for base in getattr(cls, "__orig_bases__", ()):
-            if get_origin(base) is Repository:
-                (model, _) = get_args(base)
-                if isinstance(model, type):
-                    # Check if it's a valid model type
-                    # Accept both DeclarativeBase (SQLAlchemy) and SQLModel models
-                    if issubclass(model, DeclarativeBase):
-                        cls.model = model
-                        return
-                    if (
-                        SQLMODEL_AVAILABLE
-                        and SQLModel is not None
-                        and issubclass(model, SQLModel)
-                    ):
-                        cls.model = model
-                        return
-
-    def __init__(self, session: Session):
-        """
-        Initializes the repository with a SQLAlchemy session.
-
-        Args:
-            session (Session): The SQLAlchemy session to use for database operations.
-
-        Raises:
-            TypeError: If the model type is not specified in the subclass.
-        """
-        self.session = session
-        if not hasattr(self.__class__, "model"):
-            raise TypeError(
-                f"{self.__class__.__name__} must specify a model via Repository[Model]"
-            )
+    model: type[Any]
+    session: Session
 
     def _model_type(self) -> type[EntityType]:
         """
@@ -152,7 +88,7 @@ class Repository(Generic[EntityType, IdType]):
 
     def find_all(
         self,
-        order_by: ColumnExpressionArgument[Base] | None = None,
+        order_by: ColumnExpressionArgument[Any] | None = None,
     ) -> Sequence[EntityType]:
         """
         Returns all instances of the model type.
@@ -320,3 +256,108 @@ class Repository(Generic[EntityType, IdType]):
         Rolls back the current transaction, discarding all pending changes.
         """
         self.session.rollback()
+
+
+class Repository(_RepositoryMixin[EntityType, IdType]):
+    """
+    Generic repository for SQLAlchemy DeclarativeBase models.
+
+    This class is inspired by Spring Data's CrudRepository interface.
+    Subclasses must specify the model type via Repository[Model, IdType].
+
+    Example:
+        ```python
+        class User(Base):
+            __tablename__ = "users"
+            id: Mapped[int] = mapped_column(Integer, primary_key=True)
+            name: Mapped[str] = mapped_column(String(50))
+
+        class UserRepository(Repository[User, int]):
+            pass
+        ```
+    """
+
+    model: type[DeclarativeBase]
+
+    def __init_subclass__(cls, **kwargs):
+        """
+        Initializes the subclass and sets the model type for the repository.
+        """
+        super().__init_subclass__(**kwargs)
+        for base in getattr(cls, "__orig_bases__", ()):
+            if get_origin(base) is Repository:
+                (model, _) = get_args(base)
+                if isinstance(model, type) and issubclass(model, DeclarativeBase):
+                    cls.model = model
+                    return
+
+    def __init__(self, session: Session):
+        """
+        Initializes the repository with a SQLAlchemy session.
+
+        Args:
+            session (Session): The SQLAlchemy session to use for database operations.
+
+        Raises:
+            TypeError: If the model type is not specified in the subclass.
+        """
+        self.session = session
+        if not hasattr(self.__class__, "model"):
+            raise TypeError(
+                f"{self.__class__.__name__} must specify a model via Repository[Model, IdType]"
+            )
+
+
+if SQLMODEL_AVAILABLE:
+
+    class SQLModelRepository(_RepositoryMixin[SQLModelEntityType, IdType]):  # type: ignore
+        """
+        Generic repository for SQLModel models.
+
+        This class provides the same repository pattern for SQLModel models
+        with built-in Pydantic validation.
+
+        Example:
+            ```python
+            from sqlmodel import Field, SQLModel
+            from sqla_repository.core import SQLModelRepository
+
+            class Hero(SQLModel, table=True):
+                id: int | None = Field(default=None, primary_key=True)
+                name: str = Field(index=True)
+                age: int | None = None
+
+            class HeroRepository(SQLModelRepository[Hero, int]):
+                pass
+            ```
+        """
+
+        model: type[SQLModel]  # type: ignore
+
+        def __init_subclass__(cls, **kwargs):
+            """
+            Initializes the subclass and sets the model type for the repository.
+            """
+            super().__init_subclass__(**kwargs)
+            for base in getattr(cls, "__orig_bases__", ()):
+                if get_origin(base) is SQLModelRepository:
+                    (model, _) = get_args(base)
+                    if isinstance(model, type) and issubclass(model, SQLModel):  # type: ignore
+                        cls.model = model
+                        return
+
+        def __init__(self, session: Session):
+            """
+            Initializes the repository with a SQLAlchemy session.
+
+            Args:
+                session (Session): The SQLAlchemy session to use for database operations.
+
+            Raises:
+                TypeError: If the model type is not specified in the subclass.
+            """
+            self.session = session
+            if not hasattr(self.__class__, "model"):
+                raise TypeError(
+                    f"{self.__class__.__name__} must specify a model via SQLModelRepository[Model, IdType]"
+                )
