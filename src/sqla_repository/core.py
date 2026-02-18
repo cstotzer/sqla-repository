@@ -1,9 +1,10 @@
 from collections.abc import Iterable
 from typing import (
+    TYPE_CHECKING,
+    Any,
     Generic,
     Sequence,
     TypeVar,
-    Union,
     cast,
     get_args,
     get_origin,
@@ -12,13 +13,19 @@ from typing import (
 from sqlalchemy import ColumnExpressionArgument, delete, func, select
 from sqlalchemy.orm import DeclarativeBase, Session
 
+if TYPE_CHECKING:
+    try:
+        from sqlmodel import SQLModel
+    except ImportError:
+        pass
+
 try:
     from sqlmodel import SQLModel
 
     SQLMODEL_AVAILABLE = True
 except ImportError:
-    SQLModel = None  # type: ignore
     SQLMODEL_AVAILABLE = False
+    SQLModel = None  # type: ignore
 
 
 class Base(DeclarativeBase):
@@ -27,10 +34,9 @@ class Base(DeclarativeBase):
     pass
 
 
-if SQLMODEL_AVAILABLE:
-    EntityType = TypeVar("EntityType", bound=Union[Base, SQLModel])  # type: ignore
-else:
-    EntityType = TypeVar("EntityType", bound=Base)
+# EntityType bound to DeclarativeBase for SQLAlchemy models
+# SQLModel models work at runtime but aren't bound by inheritance
+EntityType = TypeVar("EntityType", bound=DeclarativeBase)
 IdType = TypeVar("IdType")
 
 
@@ -54,15 +60,12 @@ class Repository(Generic[EntityType, IdType]):
             if get_origin(base) is Repository:
                 (model, _) = get_args(base)
                 if isinstance(model, type):
-                    # Check if it's a valid model type (Base or SQLModel)
-                    if issubclass(model, Base):
+                    # Check if it's a valid model type
+                    # Accept both DeclarativeBase (SQLAlchemy) and SQLModel models
+                    if issubclass(model, DeclarativeBase):
                         cls.model = model
                         return
-                    if (
-                        SQLMODEL_AVAILABLE
-                        and SQLModel
-                        and issubclass(model, SQLModel)
-                    ):
+                    if SQLMODEL_AVAILABLE and SQLModel is not None and issubclass(model, SQLModel):
                         cls.model = model
                         return
 
