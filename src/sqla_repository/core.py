@@ -1,8 +1,24 @@
 from collections.abc import Iterable
-from typing import Generic, Sequence, TypeVar, cast, get_args, get_origin
+from typing import (
+    Generic,
+    Sequence,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from sqlalchemy import ColumnExpressionArgument, delete, func, select
 from sqlalchemy.orm import DeclarativeBase, Session
+
+try:
+    from sqlmodel import SQLModel
+
+    SQLMODEL_AVAILABLE = True
+except ImportError:
+    SQLModel = None  # type: ignore
+    SQLMODEL_AVAILABLE = False
 
 
 class Base(DeclarativeBase):
@@ -11,7 +27,10 @@ class Base(DeclarativeBase):
     pass
 
 
-EntityType = TypeVar("EntityType", bound=Base)
+if SQLMODEL_AVAILABLE:
+    EntityType = TypeVar("EntityType", bound=Union[Base, SQLModel])  # type: ignore
+else:
+    EntityType = TypeVar("EntityType", bound=Base)
 IdType = TypeVar("IdType")
 
 
@@ -28,14 +47,24 @@ class Repository(Generic[EntityType, IdType]):
     def __init_subclass__(cls, **kwargs):
         """
         Initializes the subclass and sets the model type for the repository.
+        Supports both SQLAlchemy Base and SQLModel models.
         """
         super().__init_subclass__(**kwargs)
         for base in getattr(cls, "__orig_bases__", ()):
             if get_origin(base) is Repository:
                 (model, _) = get_args(base)
-                if isinstance(model, type) and issubclass(model, Base):
-                    cls.model = model
-                    return
+                if isinstance(model, type):
+                    # Check if it's a valid model type (Base or SQLModel)
+                    if issubclass(model, Base):
+                        cls.model = model
+                        return
+                    if (
+                        SQLMODEL_AVAILABLE
+                        and SQLModel
+                        and issubclass(model, SQLModel)
+                    ):
+                        cls.model = model
+                        return
 
     def __init__(self, session: Session):
         """
