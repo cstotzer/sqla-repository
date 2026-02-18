@@ -55,9 +55,6 @@ dev = [
     "aiosqlite>=0.20.0,<0.21.0",
     "greenlet>=3.2.0,<4.0.0",
 ]
-gen = [
-    "sqlacodegen>=3.2.0,<4.0.0",
-]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sqla_repository"]
